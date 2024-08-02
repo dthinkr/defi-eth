@@ -3,7 +3,6 @@ theme: dashboard
 title: Ethereum Distribution Dashboard
 toc: false
 ---
-
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -102,7 +101,6 @@ function formatPercentage(num) {
   return (num * 100).toFixed(2) + '%';
 }
 ```
-
 
 <div class="grid grid-cols-4 gap-4">
   <div class="card">
@@ -210,7 +208,6 @@ function stackedAreaChart(data, {width} = {}) {
 }
 ```
 
-
 <div class="card">
   ${resize((width) => stackedAreaChart(data, {width}))}
 </div>
@@ -252,7 +249,6 @@ function circulatingSupplyChart(data, {width} = {}) {
 }
 ```
 
-
 <div class="card">
   ${resize((width) => circulatingSupplyChart(data, {width}))}
 </div>
@@ -271,5 +267,8 @@ function circulatingSupplyChart(data, {width} = {}) {
   </div>
 </div>
 
-*Data updated as of ${latestData.unified_timestamp.toLocaleDateString()}*
+*Data updated from GlassNode, as of ${latestData.unified_timestamp.toLocaleDateString()}*
+
+```
+
 ```
