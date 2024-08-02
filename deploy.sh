@@ -14,13 +14,13 @@ update_from_remote() {
     if [ $LOCAL != $REMOTE ]; then
         echo "Updating from remote..."
         git pull origin $BRANCH
-        NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN docker-compose up -d --build
+        NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN docker compose up -d --build
     fi
 }
 
 start_services() {
-    NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN docker-compose up -d --build
-    docker-compose logs -f $(docker-compose config --services | grep -v app)
+    NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN docker compose up -d --build
+    docker compose logs -f $(docker compose config --services | grep -v app)
 }
 
 update_from_remote
