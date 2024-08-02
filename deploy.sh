@@ -1,30 +1,46 @@
 #!/bin/bash
 
 set -e
-set -x
 
 REPO_URL="https://github.com/dthinkr/defi-eth.git"
 BRANCH="deploy"
 REPO_DIR="defi-eth"
 
-echo "Starting deployment script"
+# Function to prompt for NGROK_AUTH_TOKEN
+prompt_for_token() {
+    if [ -z "$NGROK_AUTH_TOKEN" ]; then
+        read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
+        export NGROK_AUTH_TOKEN
+    fi
+}
 
-read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
-export NGROK_AUTH_TOKEN
+# Main deployment logic
+deploy() {
+    echo "Starting deployment script"
 
-echo "Current directory: $(pwd)"
-echo "Checking for repository directory: $REPO_DIR"
+    echo "Current directory: $(pwd)"
+    echo "Checking for repository directory: $REPO_DIR"
 
-if [ ! -d "$REPO_DIR" ]; then
-    echo "Cloning repository"
-    git clone -b $BRANCH $REPO_URL $REPO_DIR
-else
-    echo "Repository directory already exists"
-fi
+    if [ ! -d "$REPO_DIR" ]; then
+        echo "Cloning repository"
+        git clone -b $BRANCH $REPO_URL $REPO_DIR
+    else
+        echo "Repository directory already exists"
+    fi
 
-echo "Changing to repository directory"
-cd $REPO_DIR
-echo "Current directory after cd: $(pwd)"
+    echo "Changing to repository directory"
+    cd $REPO_DIR
+    echo "Current directory after cd: $(pwd)"
+
+    update_from_remote
+    start_services
+
+    echo "Entering update loop"
+    while true; do
+        sleep 300
+        update_from_remote
+    done
+}
 
 update_from_remote() {
     echo "Updating from remote"
@@ -48,11 +64,8 @@ start_services() {
     docker compose logs -f $(docker compose config --services | grep -v app)
 }
 
-update_from_remote
-start_services
-
-echo "Entering update loop"
-while true; do
-    sleep 300
-    update_from_remote
-done
+# Check if the script is being sourced or executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    prompt_for_token
+    deploy
+fi
