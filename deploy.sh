@@ -2,9 +2,16 @@
 
 REPO_URL="https://github.com/dthinkr/defi-eth.git"
 BRANCH="deploy"
+REPO_DIR="defi-eth"
 
 read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
 export NGROK_AUTH_TOKEN
+
+if [ ! -d "$REPO_DIR" ]; then
+    git clone -b $BRANCH $REPO_URL $REPO_DIR
+fi
+
+cd $REPO_DIR
 
 update_from_remote() {
     git fetch origin $BRANCH
