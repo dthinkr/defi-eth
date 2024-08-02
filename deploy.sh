@@ -40,8 +40,14 @@ if [ -f "ngrok.yml" ]; then
     rm ngrok.yml
 fi
 
-# Update docker-compose.yml to use the correct domain
-sed -i 's/--domain=dthinkr.ngrok.app/--domain=dthinkr.ngrok.app/' docker-compose.yml
+# Update docker-compose.yml to use the correct domain (if needed)
+if grep -q "dthinkr.ngrok.app" docker-compose.yml; then
+    echo "docker-compose.yml already contains the correct domain."
+else
+    echo "Updating docker-compose.yml with the correct domain..."
+    sed -i.bak 's/--domain=[^ ]*/--domain=dthinkr.ngrok.app/' docker-compose.yml
+    rm docker-compose.yml.bak
+fi
 
 # Build and start the containers
 docker-compose up -d --build
