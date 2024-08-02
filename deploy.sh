@@ -29,24 +29,19 @@ else
     git pull origin $BRANCH
 fi
 
-# Check for NGROK_AUTH_TOKEN in environment
-if [ -z "$NGROK_AUTH_TOKEN" ]; then
-    read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
-    export NGROK_AUTH_TOKEN
-fi
-
-# Remove ngrok.yml if it exists (we'll use environment variable instead)
-if [ -f "ngrok.yml" ]; then
-    rm ngrok.yml
-fi
-
-# Update docker-compose.yml to use the correct domain (if needed)
-if grep -q "dthinkr.ngrok.app" docker-compose.yml; then
-    echo "docker-compose.yml already contains the correct domain."
-else
-    echo "Updating docker-compose.yml with the correct domain..."
-    sed -i.bak 's/--domain=[^ ]*/--domain=dthinkr.ngrok.app/' docker-compose.yml
-    rm docker-compose.yml.bak
+# Check for ngrok.yml and create if it doesn't exist
+if [ ! -f "ngrok.yml" ]; then
+    if [ -z "$NGROK_AUTH_TOKEN" ]; then
+        read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
+    fi
+    cat > ngrok.yml << EOL
+version: "2"
+authtoken: $NGROK_AUTH_TOKEN
+tunnels:
+  defi-eth:
+    addr: nginx:80
+    proto: http
+EOL
 fi
 
 # Build and start the containers
