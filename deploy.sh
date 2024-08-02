@@ -44,6 +44,19 @@ tunnels:
 EOL
 fi
 
+# Update docker-compose.yml to use the correct domain
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' 's/--domain=.*ngrok.app/--domain=dthinkr.ngrok.app/' docker-compose.yml
+else
+    # Linux and others
+    sed -i 's/--domain=.*ngrok.app/--domain=dthinkr.ngrok.app/' docker-compose.yml
+fi
+
+# Print the updated ngrok command from docker-compose.yml
+echo "Updated ngrok command in docker-compose.yml:"
+grep -A 3 "ngrok:" docker-compose.yml
+
 # Build and start the containers
 docker-compose up -d --build
 
