@@ -3,10 +3,12 @@
 REPO_URL="https://github.com/dthinkr/defi-eth.git"
 BRANCH="deploy"
 
-if [ -z "$NGROK_AUTH_TOKEN" ]; then
-    read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
-    export NGROK_AUTH_TOKEN
-fi
+prompt_for_token() {
+    if [ -z "$NGROK_AUTH_TOKEN" ]; then
+        read -p "Enter your ngrok auth token: " NGROK_AUTH_TOKEN
+        export NGROK_AUTH_TOKEN
+    fi
+}
 
 update_from_remote() {
     git fetch origin $BRANCH
@@ -16,11 +18,13 @@ update_from_remote() {
     if [ $LOCAL != $REMOTE ]; then
         echo "Updating from remote..."
         git pull origin $BRANCH
+        prompt_for_token
         NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN docker-compose up -d --build
     fi
 }
 
 start_services() {
+    prompt_for_token
     NGROK_AUTH_TOKEN=$NGROK_AUTH_TOKEN docker-compose up -d --build
     docker-compose logs -f $(docker-compose config --services | grep -v app)
 }
